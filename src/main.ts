@@ -11,6 +11,14 @@ import * as Hammer from 'hammerjs';
 import { AppComponent } from './app/app.component';
 import { appRoutes } from './app/app.routing';
 import { environment } from './environments/environment';
+import { EntityDataModule, HttpUrlGenerator } from '@ngrx/data';
+import { EffectsModule } from '@ngrx/effects';
+import { StoreModule } from '@ngrx/store';
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { DynamicHttpUrlGenerator, entityConfig } from './app/store/meta.store';
+import { HttpClientModule } from '@angular/common/http';
+import { HttpClientInMemoryWebApiModule } from 'angular-in-memory-web-api';
+import { DataService } from './app/data.service';
 
 if (environment.production) {
   enableProdMode();
@@ -31,12 +39,17 @@ bootstrapApplication(AppComponent, {
       BrowserAnimationsModule,
       FormsModule,
       HammerModule,
+      HttpClientModule,
       MatProgressBarModule,
       MatButtonModule, 
-      MatIconModule
+      MatIconModule,
+      StoreModule.forRoot({}, {}),
+      EffectsModule.forRoot([]), 
+      EntityDataModule.forRoot(entityConfig),
+      StoreDevtoolsModule.instrument(),  
+      HttpClientInMemoryWebApiModule.forRoot(DataService),
     ),
-    {
-      provide: HAMMER_GESTURE_CONFIG,
-      useClass: HammerConfig
-    },]
+    { provide: HAMMER_GESTURE_CONFIG, useClass: HammerConfig },
+    { provide: HttpUrlGenerator, useClass: DynamicHttpUrlGenerator }
+    ]
 })
