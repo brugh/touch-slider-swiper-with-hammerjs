@@ -14,35 +14,21 @@ export const entityConfig = {
   pluralNames
 };
 
-type Urls = { [key:string]: string; } 
+type Urls = { [key:string]: string; } // hbr; added for typescript errors on string indexing
 export const rootUrls:Urls = {
   Product: 'api' // 'api/products' from local app (in memory db)
 }
 
 @Injectable()
 export class DynamicHttpUrlGenerator extends DefaultHttpUrlGenerator {
-
-  constructor(private aPluralizer: Pluralizer) {
-    super(aPluralizer);
-  }
+  constructor(private aPluralizer: Pluralizer) {super(aPluralizer);}
 
   protected override getResourceUrls(entityName: string, root: string): HttpResourceUrls {
     let resourceUrls = this.knownHttpResourceUrls[entityName];
     if (!resourceUrls) {
-      // rootUrls contains
-      // mapping of individual ngrx data entities 
-      // to the root URLs of their respective data sources.
-      // It contains only entities which do not have
-      // the default root URL.
-      if (rootUrls.hasOwnProperty(entityName)) {
-        root = rootUrls[entityName];
-      }
+      if (rootUrls.hasOwnProperty(entityName)) root = rootUrls[entityName];
       const nRoot = normalizeRoot(root);
       const url = `${nRoot}/${this.aPluralizer.pluralize(entityName)}/`.toLowerCase();
-
-      // remove after testing
-      console.log('-- entityName: ' + entityName + ', URL: ' + url)
-
       resourceUrls = {
         entityResourceUrl: url,
         collectionResourceUrl: url
